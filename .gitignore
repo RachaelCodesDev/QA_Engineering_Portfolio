@@ -1,0 +1,13 @@
+# Environment files containing local configuration or secrets
+.env
+.env.*
+!.env.example
+
+# Private keys and certificates
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Local Postman configuration
+.postman/

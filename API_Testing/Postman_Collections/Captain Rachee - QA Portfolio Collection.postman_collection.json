@@ -1,0 +1,1748 @@
+{
+  "info": {
+    "_postman_id": "423c72c5-df1a-4728-a27f-0535684f8960",
+    "name": "Captain Rachee - QA Portfolio Collection",
+    "description": "### Welcome to Postman! This is your first collection. \n\nCollections are your starting point for building and testing APIs. You can use this one to:\n\n• Group related requests\n• Test your API in real-world scenarios\n• Document and share your requests\n\nUpdate the name and overview whenever you’re ready to make it yours.\n\n[Learn more about Postman Collections.](https://learning.postman.com/docs/collections/collections-overview/)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "58955203",
+    "_collection_link": "https://go.postman.co/collection/58955203-423c72c5-df1a-4728-a27f-0535684f8960?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "API Regression Test Suite",
+      "item": [
+        {
+          "name": "Retrieve User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "\r\npm.test(\"Status code is 200\", function () {\r\n    pm.response.to.have.status(200);\r\n});\r\n\r\npm.test(\"User ID matches collection variable\", function () {\r\n    const data = pm.response.json();\r\n    const expectedUserId = Number(pm.collectionVariables.get(\"userId\"));\r\n    pm.expect(data.id).to.eql(expectedUserId);\r\n});\r\n\r\npm.test(\"Response time is under 2000 ms\", function () {\r\n    pm.expect(pm.response.responseTime).to.be.below(2000);\r\n});\r\n\r\npm.test(\"User response matches JSON schema\", function () {\r\n    const schema = {\r\n        type: \"object\",\r\n        required: [\"id\", \"name\", \"email\", \"address\"],\r\n        properties: {\r\n            id: { type: \"integer\" },\r\n            name: { type: \"string\" },\r\n            email: { type: \"string\" },\r\n            address: {\r\n                type: \"object\",\r\n                required: [\"street\", \"city\", \"zipcode\", \"geo\"],\r\n                properties: {\r\n                    street: { type: \"string\" },\r\n                    city: { type: \"string\" },\r\n                    zipcode: { type: \"string\" },\r\n                    geo: {\r\n                        type: \"object\",\r\n                        required: [\"lat\", \"lng\"],\r\n                        properties: {\r\n                            lat: { type: \"string\" },\r\n                            lng: { type: \"string\" }\r\n                        }\r\n                    }\r\n                }\r\n            }\r\n        }\r\n    };\r\n\r\n    pm.response.to.have.jsonSchema(schema);\r\n});\r\n"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/users/{{userId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "{{userId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create New Post - POST Copy",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {\r\n    pm.response.to.have.status(201);\r\n});\r\npm.test(\"New post ID is 101\", function () {\r\n    const data = pm.response.json();\r\n    pm.expect(data.id).to.eql(101);\r\n});\r\npm.test(\"Post title matches request\", function () {\r\n    const requestData = JSON.parse(pm.request.body.raw);\r\n    const responseData = pm.response.json();\r\n\r\n    pm.expect(responseData.title).to.eql(requestData.title);\r\n});\r\npm.test(\"Post body matches request\", function () {\r\n    const requestData = JSON.parse(pm.request.body.raw);\r\n    const responseData = pm.response.json();\r\n\r\n    pm.expect(responseData.body).to.eql(requestData.body);\r\n});\r\npm.test(\"Response time is under 2000 ms\", function () {\r\n    pm.expect(pm.response.responseTime).to.be.below(2000);\r\n});\r\n\r\npm.test(\"Post response matches JSON schema\", function () {\r\n    const schema = {\r\n        type: \"object\",\r\n        required: [\"title\", \"body\", \"userId\", \"id\"],\r\n        properties: {\r\n            title: { type: \"string\" },\r\n            body: { type: \"string\" },\r\n            userId: { type: \"integer\" },\r\n            id: { type: \"integer\" }\r\n        }\r\n    };\r\n\r\n    pm.response.to.have.jsonSchema(schema);\r\n});\r\n"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"title\": \"Developer Rachee Takes Flight!\",\r\n  \"body\": \"Developer Rachee is learning API testing!\",\r\n  \"userId\": 1\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/posts",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "posts"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Data-Driven API Tests",
+      "item": [
+        {
+          "name": "Retrieve User Copy",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const userId = Number(pm.variables.get(\"userId\"));\r\nconst expectedStatus = Number.isInteger(userId) && userId >= 1 && userId <= 10 ? 200 : 404;\r\n\r\npm.test(\"Status code matches expected result\", function () {\r\n    pm.response.to.have.status(expectedStatus);\r\n});\r\n\r\npm.test(\"Response body matches expected result\", function () {\r\n    const data = pm.response.json();\r\n    const expectedUserId = Number(pm.variables.get(\"userId\"));\r\n\r\n    if (Number.isInteger(expectedUserId) && expectedUserId >= 1 && expectedUserId <= 10) {\r\n        pm.expect(data.id).to.eql(expectedUserId);\r\n    } else {\r\n        pm.expect(data).to.eql({});\r\n    }\r\n});"
+                ]
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const userIds = [5, 99999, -1, \"abc\"];\r\n\r\nconst currentUserId = userIds[pm.info.iteration];\r\n\r\npm.variables.set(\"userId\", currentUserId);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/users/{{userId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "{{userId}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "API Authentication Tests",
+      "item": [
+        {
+          "name": "Basic Authentication Test",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Valid credentials return 200 OK\", function () {\r\n    pm.response.to.have.status(200);\r\n});\r\n\r\npm.test(\"Authentication is successful\", function () {\r\n    const data = pm.response.json();\r\n    pm.expect(data.authenticated).to.eql(true);\r\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "basic",
+              "basic": [
+                {
+                  "key": "username",
+                  "value": "{{portfolioBasicUsername}}",
+                  "type": "string"
+                },
+                {
+                  "key": "password",
+                  "value": "{{portfolioBasicPassword}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://httpbin.org/basic-auth/captain/rachee123",
+              "protocol": "https",
+              "host": [
+                "httpbin",
+                "org"
+              ],
+              "path": [
+                "basic-auth",
+                "captain",
+                "rachee123"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Invalid Credentials Test",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Invalid credentials return 401 Unauthorized\", function () {\r\n    pm.response.to.have.status(401);\r\n});\r\n\r\npm.test(\"Invalid credentials do not authenticate\", function () {\r\n    const responseBody = pm.response.text();\r\n    pm.expect(responseBody).to.not.include('\"authenticated\": true');\r\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "basic",
+              "basic": [
+                {
+                  "key": "username",
+                  "value": "{{portfolioInvalidUsername}}",
+                  "type": "string"
+                },
+                {
+                  "key": "password",
+                  "value": "{{portfolioInvalidPassword}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://httpbin.org/basic-auth/captain/rachee123",
+              "protocol": "https",
+              "host": [
+                "httpbin",
+                "org"
+              ],
+              "path": [
+                "basic-auth",
+                "captain",
+                "rachee123"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "API Bearer Token Tests",
+      "item": [
+        {
+          "name": "Bearer Token Authentication Test",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Valid Bearer token returns 200 OK\", function () {\r\n    pm.response.to.have.status(200);\r\n});\r\n\r\npm.test(\"Bearer token authentication is successful\", function () {\r\n    const data = pm.response.json();\r\n    pm.expect(data.authenticated).to.eql(true);\r\n});\r\n"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{portfolioBearerToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://httpbin.org/bearer",
+              "protocol": "https",
+              "host": [
+                "httpbin",
+                "org"
+              ],
+              "path": [
+                "bearer"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Missing Bearer Token Test",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Missing Bearer token returns 401 Unauthorized\", function () {\r\n    pm.response.to.have.status(401);\r\n});\r\n"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://httpbin.org/bearer",
+              "protocol": "https",
+              "host": [
+                "httpbin",
+                "org"
+              ],
+              "path": [
+                "bearer"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "API Authorization Tests",
+      "item": [
+        {
+          "name": "Forbidden Access Test",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Forbidden access returns 403\", function () {\r\n    pm.response.to.have.status(403);\r\n});\r\n"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://httpbin.org/status/403",
+              "protocol": "https",
+              "host": [
+                "httpbin",
+                "org"
+              ],
+              "path": [
+                "status",
+                "403"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Unauthorized Access Test",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Unauthorized access returns 401\", function () {\r\n    pm.response.to.have.status(401);\r\n});\r\n"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://httpbin.org/status/401",
+              "protocol": "https",
+              "host": [
+                "httpbin",
+                "org"
+              ],
+              "path": [
+                "status",
+                "401"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "API Header Tests",
+      "item": [
+        {
+          "name": "Accept Header Test",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Accept header request returns 200 OK\", function () {\r\n    pm.response.to.have.status(200);\r\n});\r\n\r\npm.test(\"Server receives application/json Accept header\", function () {\r\n    const data = pm.response.json();\r\n    pm.expect(data.headers.Accept).to.eql(\"application/json\");\r\n});\r\n"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "https://httpbin.org/headers",
+              "protocol": "https",
+              "host": [
+                "httpbin",
+                "org"
+              ],
+              "path": [
+                "headers"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Content-Type Header Test",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Content-Type request returns 200 OK\", function () {\r\n    pm.response.to.have.status(200);\r\n});\r\n\r\npm.test(\"Server receives JSON Content-Type header\", function () {\r\n    const data = pm.response.json();\r\n    pm.expect(data.headers[\"Content-Type\"]).to.eql(\"application/json\");\r\n});\r\n\r\npm.test(\"Server parses JSON request body\", function () {\r\n    const data = pm.response.json();\r\n    pm.expect(data.json.exercise).to.eql(\"EX-265\");\r\n});\r\n"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"tester\": \"Captain Rachee\",\r\n  \"exercise\": \"EX-265\",\r\n  \"testType\": \"Content-Type Header\",\r\n  \"status\": \"Ready for testing\"\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://httpbin.org/post",
+              "protocol": "https",
+              "host": [
+                "httpbin",
+                "org"
+              ],
+              "path": [
+                "post"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "API Query Parameter Tests",
+      "item": [
+        {
+          "name": "Query Parameter Test",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Query parameter request returns 200 OK\", function () {\r\n    pm.response.to.have.status(200);\r\n});\r\n\r\npm.test(\"Server receives destination Paris\", function () {\r\n    const data = pm.response.json();\r\n    pm.expect(data.args.destination).to.eql(\"Paris\");\r\n});\r\n\r\npm.test(\"Server receives pilot Captain Rachee\", function () {\r\n    const data = pm.response.json();\r\n    pm.expect(data.args.pilot).to.eql(\"Captain Rachee\");\r\n});\r\n"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://httpbin.org/get?destination=Paris&pilot=Captain Rachee",
+              "protocol": "https",
+              "host": [
+                "httpbin",
+                "org"
+              ],
+              "path": [
+                "get"
+              ],
+              "query": [
+                {
+                  "key": "destination",
+                  "value": "Paris"
+                },
+                {
+                  "key": "pilot",
+                  "value": "Captain Rachee"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "API Path Parameter Tests",
+      "item": [
+        {
+          "name": "Path Parameter Test",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Path parameter request returns 200 OK\", function () {\r\n    pm.response.to.have.status(200);\r\n});\r\n\r\npm.test(\"Server receives destination Paris in URL path\", function () {\r\n    const data = pm.response.json();\r\n    pm.expect(data.url).to.eql(\"https://httpbin.org/anything/Paris\");\r\n});\r\n"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://httpbin.org/anything/:destination",
+              "protocol": "https",
+              "host": [
+                "httpbin",
+                "org"
+              ],
+              "path": [
+                "anything",
+                ":destination"
+              ],
+              "variable": [
+                {
+                  "key": "destination",
+                  "value": "Paris"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "API Response Data Type Tests",
+      "item": [
+        {
+          "name": "Response Data Type Test",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Response method is a string\", function () {\r\n    const data = pm.response.json();\r\n    pm.expect(data.method).to.be.a(\"string\");\r\n});\r\n\r\npm.test(\"Response headers is an object\", function () {\r\n    const data = pm.response.json();\r\n    pm.expect(data.headers).to.be.an(\"object\");\r\n});\r\n\r\npm.test(\"Response json field is null\", function () {\r\n    const data = pm.response.json();\r\n    pm.expect(data.json).to.be.null;\r\n});\r\n\r\npm.test(\"Flight number query parameter is a string\", function () {\r\n    const data = pm.response.json();\r\n    pm.expect(data.args.flightNumber).to.be.a(\"string\");\r\n});\r\n\r\npm.test(\"Flight number converts to a number\", function () {\r\n    const data = pm.response.json();\r\n    const flightNumber = Number(data.args.flightNumber);\r\n    pm.expect(flightNumber).to.be.a(\"number\");\r\n    pm.expect(flightNumber).to.eql(268);\r\n});\r\n"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://httpbin.org/anything?flightNumber=268",
+              "protocol": "https",
+              "host": [
+                "httpbin",
+                "org"
+              ],
+              "path": [
+                "anything"
+              ],
+              "query": [
+                {
+                  "key": "flightNumber",
+                  "value": "268"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "API Boolean Data Type Test",
+      "item": [
+        {
+          "name": "Boolean Data Type Test",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Authenticated field is a boolean\", function () {\r\n    const data = pm.response.json();\r\n    pm.expect(data.authenticated).to.be.a(\"boolean\");\r\n});\r\n\r\npm.test(\"Authenticated field is true\", function () {\r\n    const data = pm.response.json();\r\n    pm.expect(data.authenticated).to.eql(true);\r\n});\r\n\r\npm.test(\"Bearer token field is a string\", function () {\r\n    const data = pm.response.json();\r\n    pm.expect(data.token).to.be.a(\"string\");\r\n});\r\n"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{portfolioBearerToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://httpbin.org/bearer",
+              "protocol": "https",
+              "host": [
+                "httpbin",
+                "org"
+              ],
+              "path": [
+                "bearer"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "API Array Data Type Tests",
+      "item": [
+        {
+          "name": "Array Data Type Test",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Slides field is an array\", function () {\r\n    const data = pm.response.json();\r\n    pm.expect(data.slideshow.slides).to.be.an(\"array\");\r\n});\r\npm.test(\"Slides array is not empty\", function () {\r\n    const data = pm.response.json();\r\n    pm.expect(data.slideshow.slides.length).to.be.above(0);\r\n});\r\n\r\npm.test(\"First slide has a title string\", function () {\r\n    const data = pm.response.json();\r\n    pm.expect(data.slideshow.slides[0].title).to.be.a(\"string\");\r\n});\r\n\r\npm.test(\"Slides array contains exactly two items\", function () {\r\n    const data = pm.response.json();\r\n    pm.expect(data.slideshow.slides.length).to.eql(2);\r\n});\r\n"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://httpbin.org/json",
+              "protocol": "https",
+              "host": [
+                "httpbin",
+                "org"
+              ],
+              "path": [
+                "json"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "API Nested Object Tests",
+      "item": [
+        {
+          "name": "Nested Object Test",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Slideshow field is a nested object\", function () {\r\n    const data = pm.response.json();\r\n    pm.expect(data.slideshow).to.be.an(\"object\");\r\n});\r\n\r\npm.test(\"Slideshow author is a string\", function () {\r\n    const data = pm.response.json();\r\n    pm.expect(data.slideshow.author).to.be.a(\"string\");\r\n});\r\n\r\npm.test(\"Slideshow title matches expected value\", function () {\r\n    const data = pm.response.json();\r\n    pm.expect(data.slideshow.title).to.eql(\"Sample Slide Show\");\r\n});\r\n\r\npm.test(\"First slide is a nested object\", function () {\r\n    const data = pm.response.json();\r\n    pm.expect(data.slideshow.slides[0]).to.be.an(\"object\");\r\n});\r\n"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://httpbin.org/json",
+              "protocol": "https",
+              "host": [
+                "httpbin",
+                "org"
+              ],
+              "path": [
+                "json"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "API Nested Array Tests",
+      "item": [
+        {
+          "name": "Nested Array Test",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Second slide items is an array\", function () {\r\n    const data = pm.response.json();\r\n    pm.expect(data.slideshow.slides[1].items).to.be.an(\"array\");\r\n});\r\n\r\npm.test(\"Second slide items array is not empty\", function () {\r\n    const data = pm.response.json();\r\n    pm.expect(data.slideshow.slides[1].items.length).to.be.above(0);\r\n});\r\n\r\npm.test(\"First nested item is a string\", function () {\r\n    const data = pm.response.json();\r\n    pm.expect(data.slideshow.slides[1].items[0]).to.be.a(\"string\");\r\n});\r\n\r\npm.test(\"Nested items array contains exactly two elements\", function () {\r\n    const data = pm.response.json();\r\n    pm.expect(data.slideshow.slides[1].items.length).to.eql(2);\r\n});\r\n"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://httpbin.org/json",
+              "protocol": "https",
+              "host": [
+                "httpbin",
+                "org"
+              ],
+              "path": [
+                "json"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "API Array Element Value Tests",
+      "item": [
+        {
+          "name": "Array Element Value Test",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"First slide title matches expected value\", function () {\r\n    const data = pm.response.json();\r\n    pm.expect(data.slideshow.slides[0].title).to.eql(\"Wake up to WonderWidgets!\");\r\n});\r\n\r\npm.test(\"Second slide title matches expected value\", function () {\r\n    const data = pm.response.json();\r\n    pm.expect(data.slideshow.slides[1].title).to.eql(\"Overview\");\r\n});\r\n\r\npm.test(\"First nested item matches expected value\", function () {\r\n    const data = pm.response.json();\r\n    pm.expect(data.slideshow.slides[1].items[0]).to.eql(\"Why <em>WonderWidgets</em> are great\");\r\n});\r\n\r\npm.test(\"Second nested item matches expected value\", function () {\r\n    const data = pm.response.json();\r\n    pm.expect(data.slideshow.slides[1].items[1]).to.eql(\"Who <em>buys</em> WonderWidgets\");\r\n});\r\n"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://httpbin.org/json",
+              "protocol": "https",
+              "host": [
+                "httpbin",
+                "org"
+              ],
+              "path": [
+                "json"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "API Array Object Property Tests",
+      "item": [
+        {
+          "name": "Array Object Property Test",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"First slide object has a title property\", function () {\r\n    const data = pm.response.json();\r\n    pm.expect(data.slideshow.slides[0]).to.have.property(\"title\");\r\n});\r\n\r\npm.test(\"First slide object has a type property\", function () {\r\n    const data = pm.response.json();\r\n    pm.expect(data.slideshow.slides[0]).to.have.property(\"type\");\r\n});\r\n\r\npm.test(\"Second slide object has a title property\", function () {\r\n    const data = pm.response.json();\r\n    pm.expect(data.slideshow.slides[1]).to.have.property(\"title\");\r\n});\r\n\r\npm.test(\"Second slide object has an items property\", function () {\r\n    const data = pm.response.json();\r\n    pm.expect(data.slideshow.slides[1]).to.have.property(\"items\");\r\n});\r\n"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://httpbin.org/json",
+              "protocol": "https",
+              "host": [
+                "httpbin",
+                "org"
+              ],
+              "path": [
+                "json"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "API Array Object Property Value Tests",
+      "item": [
+        {
+          "name": "Array Object Property Value Test",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"First slide type matches expected value\", function () {\r\n    const data = pm.response.json();\r\n    pm.expect(data.slideshow.slides[0].type).to.eql(\"all\");\r\n});\r\n\r\npm.test(\"Second slide type matches expected value\", function () {\r\n    const data = pm.response.json();\r\n    pm.expect(data.slideshow.slides[1].type).to.eql(\"all\");\r\n});\r\n\r\npm.test(\"First slide title matches expected value\", function () {\r\n    const data = pm.response.json();\r\n    pm.expect(data.slideshow.slides[0].title).to.eql(\"Wake up to WonderWidgets!\");\r\n});\r\n\r\npm.test(\"Second slide title matches expected value\", function () {\r\n    const data = pm.response.json();\r\n    pm.expect(data.slideshow.slides[1].title).to.eql(\"Overview\");\r\n});\r\n"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://httpbin.org/json",
+              "protocol": "https",
+              "host": [
+                "httpbin",
+                "org"
+              ],
+              "path": [
+                "json"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "API Array Object Property Data Type Tests",
+      "item": [
+        {
+          "name": "Array Object Property Data Type Test",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"First slide title is a string\", function () {\r\n    const data = pm.response.json();\r\n    pm.expect(data.slideshow.slides[0].title).to.be.a(\"string\");\r\n});\r\n\r\npm.test(\"Second slide title is a string\", function () {\r\n    const data = pm.response.json();\r\n    pm.expect(data.slideshow.slides[1].title).to.be.a(\"string\");\r\n});\r\n\r\npm.test(\"First slide type is a string\", function () {\r\n    const data = pm.response.json();\r\n    pm.expect(data.slideshow.slides[0].type).to.be.a(\"string\");\r\n});\r\n\r\npm.test(\"Second slide type is a string\", function () {\r\n    const data = pm.response.json();\r\n    pm.expect(data.slideshow.slides[1].type).to.be.a(\"string\");\r\n});\r\n"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://httpbin.org/json",
+              "protocol": "https",
+              "host": [
+                "httpbin",
+                "org"
+              ],
+              "path": [
+                "json"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "API Array Object Property Length Tests",
+      "item": [
+        {
+          "name": "Array Object Property Length Test",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"First slide title length is 25\", function () {\r\n    const data = pm.response.json();\r\n    pm.expect(data.slideshow.slides[0].title.length).to.eql(25);\r\n});\r\n\r\npm.test(\"Second slide title length is 8\", function () {\r\n    const data = pm.response.json();\r\n    pm.expect(data.slideshow.slides[1].title.length).to.eql(8);\r\n});\r\n\r\npm.test(\"First slide type length is 3\", function () {\r\n    const data = pm.response.json();\r\n    pm.expect(data.slideshow.slides[0].type.length).to.eql(3);\r\n});\r\n\r\npm.test(\"Second slide type length is 3\", function () {\r\n    const data = pm.response.json();\r\n    pm.expect(data.slideshow.slides[1].type.length).to.eql(3);\r\n});\r\n"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://httpbin.org/json",
+              "protocol": "https",
+              "host": [
+                "httpbin",
+                "org"
+              ],
+              "path": [
+                "json"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "API Array Object Property Non-Empty String Tests",
+      "item": [
+        {
+          "name": "Array Object Property Non-Empty String Test",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"First slide title is not empty\", function () {\r\n    const data = pm.response.json();\r\n    pm.expect(data.slideshow.slides[0].title).to.not.be.empty;\r\n});\r\n\r\npm.test(\"Second slide title is not empty\", function () {\r\n    const data = pm.response.json();\r\n    pm.expect(data.slideshow.slides[1].title).to.not.be.empty;\r\n});\r\n\r\npm.test(\"First slide type is not empty\", function () {\r\n    const data = pm.response.json();\r\n    pm.expect(data.slideshow.slides[0].type).to.not.be.empty;\r\n});\r\n\r\npm.test(\"Second slide type is not empty\", function () {\r\n    const data = pm.response.json();\r\n    pm.expect(data.slideshow.slides[1].type).to.not.be.empty;\r\n});\r\n"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://httpbin.org/json",
+              "protocol": "https",
+              "host": [
+                "httpbin",
+                "org"
+              ],
+              "path": [
+                "json"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "API String Content Validation Tests",
+      "item": [
+        {
+          "name": "String Content Validation Test",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"First slide title contains WonderWidgets\", function () {\r\n    const data = pm.response.json();\r\n    pm.expect(data.slideshow.slides[0].title).to.include(\"WonderWidgets\");\r\n});\r\n\r\npm.test(\"Second slide title contains view\", function () {\r\n    const data = pm.response.json();\r\n    pm.expect(data.slideshow.slides[1].title).to.include(\"view\");\r\n});\r\n\r\npm.test(\"First nested item contains WonderWidgets\", function () {\r\n    const data = pm.response.json();\r\n    pm.expect(data.slideshow.slides[1].items[0]).to.include(\"WonderWidgets\");\r\n});\r\n\r\npm.test(\"Second nested item contains buys\", function () {\r\n    const data = pm.response.json();\r\n    pm.expect(data.slideshow.slides[1].items[1]).to.include(\"buys\");\r\n});\r\n"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://httpbin.org/json",
+              "protocol": "https",
+              "host": [
+                "httpbin",
+                "org"
+              ],
+              "path": [
+                "json"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "API String Prefix Validation Tests",
+      "item": [
+        {
+          "name": "String Prefix Validation Test",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"First slide title starts with Wake\", function () {\r\n    const data = pm.response.json();\r\n    pm.expect(data.slideshow.slides[0].title.startsWith(\"Wake\")).to.be.true;\r\n});\r\n\r\npm.test(\"Second slide title starts with Over\", function () {\r\n    const data = pm.response.json();\r\n    pm.expect(data.slideshow.slides[1].title.startsWith(\"Over\")).to.be.true;\r\n});\r\n\r\npm.test(\"First nested item starts with Why\", function () {\r\n    const data = pm.response.json();\r\n    pm.expect(data.slideshow.slides[1].items[0].startsWith(\"Why\")).to.be.true;\r\n});\r\n\r\npm.test(\"Second nested item starts with Who\", function () {\r\n    const data = pm.response.json();\r\n    pm.expect(data.slideshow.slides[1].items[1].startsWith(\"Who\")).to.be.true;\r\n});\r\n"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://httpbin.org/json",
+              "protocol": "https",
+              "host": [
+                "httpbin",
+                "org"
+              ],
+              "path": [
+                "json"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "API String Suffix Validation Test",
+      "item": [
+        {
+          "name": "String Suffix Validation Test",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"First slide title ends with Widgets!\", function () {\r\n    const data = pm.response.json();\r\n    pm.expect(data.slideshow.slides[0].title.endsWith(\"Widgets!\")).to.be.true;\r\n});\r\n\r\npm.test(\"Second slide title ends with view\", function () {\r\n    const data = pm.response.json();\r\n    pm.expect(data.slideshow.slides[1].title.endsWith(\"view\")).to.be.true;\r\n});\r\n\r\npm.test(\"First nested item ends with great\", function () {\r\n    const data = pm.response.json();\r\n    pm.expect(data.slideshow.slides[1].items[0].endsWith(\"great\")).to.be.true;\r\n});\r\n\r\npm.test(\"Second nested item ends with Widgets\", function () {\r\n    const data = pm.response.json();\r\n    pm.expect(data.slideshow.slides[1].items[1].endsWith(\"Widgets\")).to.be.true;\r\n});\r\n"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://httpbin.org/json",
+              "protocol": "https",
+              "host": [
+                "httpbin",
+                "org"
+              ],
+              "path": [
+                "json"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "API Case-Insensitive String Validation Tests",
+      "item": [
+        {
+          "name": "Case-Insensitive String Validation Test",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Second slide title matches overview ignoring case\", function () {\r\n    const data = pm.response.json();\r\n    pm.expect(data.slideshow.slides[1].title.toLowerCase()).to.eql(\"overview\");\r\n});\r\n\r\npm.test(\"First slide title matches ignoring case\", function () {\r\n    const data = pm.response.json();\r\n    pm.expect(data.slideshow.slides[0].title.toLowerCase()).to.eql(\"wake up to wonderwidgets!\");\r\n});\r\n\r\npm.test(\"First nested item matches ignoring case\", function () {\r\n    const data = pm.response.json();\r\n    pm.expect(data.slideshow.slides[1].items[0].toLowerCase()).to.eql(\"why <em>wonderwidgets</em> are great\");\r\n});\r\n\r\npm.test(\"Second nested item matches ignoring case\", function () {\r\n    const data = pm.response.json();\r\n    pm.expect(data.slideshow.slides[1].items[1].toLowerCase()).to.eql(\"who <em>buys</em> wonderwidgets\");\r\n});\r\n"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://httpbin.org/json",
+              "protocol": "https",
+              "host": [
+                "httpbin",
+                "org"
+              ],
+              "path": [
+                "json"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "API String Whitespace Validation Tests",
+      "item": [
+        {
+          "name": "String Whitespace Validation Test",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Second slide title matches after trimming whitespace\", function () {\r\n    const data = pm.response.json();\r\n    const title = \"   \" + data.slideshow.slides[1].title + \"   \";\r\n    pm.expect(title.trim()).to.eql(\"Overview\");\r\n});\r\n\r\npm.test(\"First slide title matches after trimming whitespace\", function () {\r\n    const data = pm.response.json();\r\n    const title = \"   \" + data.slideshow.slides[0].title + \"   \";\r\n    pm.expect(title.trim()).to.eql(\"Wake up to WonderWidgets!\");\r\n});\r\n\r\npm.test(\"Second nested item matches after trimming whitespace\", function () {\r\n    const data = pm.response.json();\r\n    const item = \"   \" + data.slideshow.slides[1].items[1] + \"   \";\r\n    pm.expect(item.trim()).to.eql(\"Who <em>buys</em> WonderWidgets\");\r\n});\r\n\r\npm.test(\"First nested item matches after trimming whitespace\", function () {\r\n    const data = pm.response.json();\r\n    const item = \"   \" + data.slideshow.slides[1].items[0] + \"   \";\r\n    pm.expect(item.trim()).to.eql(\"Why <em>WonderWidgets</em> are great\");\r\n});\r\n"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://httpbin.org/json",
+              "protocol": "https",
+              "host": [
+                "httpbin",
+                "org"
+              ],
+              "path": [
+                "json"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "API String Replacement Validation Tests",
+      "item": [
+        {
+          "name": "String Replacement Validation Test",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Second slide title matches after string replacement\", function () {\r\n    const data = pm.response.json();\r\n    const title = data.slideshow.slides[1].title;\r\n    pm.expect(title.replace(\"Over\", \"Pre\")).to.eql(\"Preview\");\r\n});\r\n\r\npm.test(\"First slide title matches after string replacement\", function () {\r\n    const data = pm.response.json();\r\n    const title = data.slideshow.slides[0].title;\r\n    pm.expect(title.replace(\"Wake\", \"Rise\")).to.eql(\"Rise up to WonderWidgets!\");\r\n});\r\n\r\npm.test(\"Second nested item matches after string replacement\", function () {\r\n    const data = pm.response.json();\r\n    const item = data.slideshow.slides[1].items[1];\r\n    pm.expect(item.replace(\"Who\", \"Everyone\")).to.eql(\"Everyone <em>buys</em> WonderWidgets\");\r\n});\r\n\r\npm.test(\"First nested item matches after string replacement\", function () {\r\n    const data = pm.response.json();\r\n    const item = data.slideshow.slides[1].items[0];\r\n    pm.expect(item.replace(\"great\", \"amazing\")).to.eql(\"Why <em>WonderWidgets</em> are amazing\");\r\n});\r\n"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://httpbin.org/json",
+              "protocol": "https",
+              "host": [
+                "httpbin",
+                "org"
+              ],
+              "path": [
+                "json"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "API String Splitting Validation Tests",
+      "item": [
+        {
+          "name": "String Splitting Validation Test",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Second slide title splits into expected parts\", function () {\r\n    const data = pm.response.json();\r\n    const parts = data.slideshow.slides[1].title.split(\"v\");\r\n    pm.expect(parts).to.eql([\"O\", \"er\", \"iew\"]);\r\n});\r\n\r\npm.test(\"First slide title splits into expected words\", function () {\r\n    const data = pm.response.json();\r\n    const words = data.slideshow.slides[0].title.split(\" \");\r\n    pm.expect(words).to.eql([\"Wake\", \"up\", \"to\", \"WonderWidgets!\"]);\r\n});\r\n\r\npm.test(\"Second nested item splits into expected words\", function () {\r\n    const data = pm.response.json();\r\n    const words = data.slideshow.slides[1].items[1].split(\" \");\r\n    pm.expect(words).to.eql([\"Who\", \"<em>buys</em>\", \"WonderWidgets\"]);\r\n});\r\n\r\npm.test(\"First nested item splits into expected words\", function () {\r\n    const data = pm.response.json();\r\n    const words = data.slideshow.slides[1].items[0].split(\" \");\r\n    pm.expect(words).to.eql([\"Why\", \"<em>WonderWidgets</em>\", \"are\", \"great\"]);\r\n});\r\n"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://httpbin.org/json",
+              "protocol": "https",
+              "host": [
+                "httpbin",
+                "org"
+              ],
+              "path": [
+                "json"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "API String Slicing Validation Tests",
+      "item": [
+        {
+          "name": "String Slicing Validation Test",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"First slide title starts with Wake using slice\", function () {\r\n    const data = pm.response.json();\r\n    const slicedText = data.slideshow.slides[0].title.slice(0, 4);\r\n    pm.expect(slicedText).to.eql(\"Wake\");\r\n});\r\n\r\npm.test(\"Slideshow title extracts Slide using slice\", function () {\r\n    const data = pm.response.json();\r\n    const slicedText = data.slideshow.title.slice(7, 12);\r\n    pm.expect(slicedText).to.eql(\"Slide\");\r\n});\r\n\r\npm.test(\"Second nested item extracts WonderWidgets using slice\", function () {\r\n    const data = pm.response.json();\r\n    const slicedText = data.slideshow.slides[1].items[1].slice(-13);\r\n    pm.expect(slicedText).to.eql(\"WonderWidgets\");\r\n});\r\n\r\npm.test(\"First nested item extracts Why using slice\", function () {\r\n    const data = pm.response.json();\r\n    const slicedText = data.slideshow.slides[1].items[0].slice(0, 3);\r\n    pm.expect(slicedText).to.eql(\"Why\");\r\n});\r\n"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://httpbin.org/json",
+              "protocol": "https",
+              "host": [
+                "httpbin",
+                "org"
+              ],
+              "path": [
+                "json"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "API String Index Validation Tests",
+      "item": [
+        {
+          "name": "String Index Validation Test",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"First slide title finds WonderWidgets at index 11\", function () {\n    const data = pm.response.json();\n    const position = data.slideshow.slides[0].title.indexOf(\"WonderWidgets\");\n    pm.expect(position).to.eql(11);\n});\n\npm.test(\"Slideshow title finds Slide at index 7\", function () {\n    const data = pm.response.json();\n    const position = data.slideshow.title.indexOf(\"Slide\");\n    pm.expect(position).to.eql(7);\n});\n\npm.test(\"Second nested item finds buys at index 8\", function () {\n    const data = pm.response.json();\n    const position = data.slideshow.slides[1].items[1].indexOf(\"buys\");\n    pm.expect(position).to.eql(8);\n});\n\npm.test(\"First nested item finds WonderWidgets at index 8\", function () {\n    const data = pm.response.json();\n    const position = data.slideshow.slides[1].items[0].indexOf(\"WonderWidgets\");\n    pm.expect(position).to.eql(8);\n});\n"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://httpbin.org/json",
+              "protocol": "https",
+              "host": [
+                "httpbin",
+                "org"
+              ],
+              "path": [
+                "json"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "API String Last Index Validation Tests",
+      "item": [
+        {
+          "name": "String Last Index Validation Test",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Slideshow title finds last lowercase l at index 8\", function () {\n    const data = pm.response.json();\n    const position = data.slideshow.title.lastIndexOf(\"l\");\n    pm.expect(position).to.eql(8);\n});\n\npm.test(\"First slide title finds last capital W at index 17\", function () {\n    const data = pm.response.json();\n    const position = data.slideshow.slides[0].title.lastIndexOf(\"W\");\n    pm.expect(position).to.eql(17);\n});\n\npm.test(\"Second nested item finds last lowercase s at index 30\", function () {\n    const data = pm.response.json();\n    const position = data.slideshow.slides[1].items[1].lastIndexOf(\"s\");\n    pm.expect(position).to.eql(30);\n});\n\npm.test(\"Slideshow author has no lowercase z\", function () {\n    const data = pm.response.json();\n    const position = data.slideshow.author.lastIndexOf(\"z\");\n    pm.expect(position).to.eql(-1);\n});\n"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://httpbin.org/json",
+              "protocol": "https",
+              "host": [
+                "httpbin",
+                "org"
+              ],
+              "path": [
+                "json"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "API String Character Validation Tests",
+      "item": [
+        {
+          "name": "String Character Validation Test",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Slideshow title starts with character S\", function () {\r\n    const data = pm.response.json();\r\n    const character = data.slideshow.title.charAt(0);\r\n    pm.expect(character).to.eql(\"S\");\r\n});\r\n\r\npm.test(\"Slideshow author has character T at index 6\", function () {\r\n    const data = pm.response.json();\r\n    const character = data.slideshow.author.charAt(6);\r\n    pm.expect(character).to.eql(\"T\");\r\n});\r\n\r\npm.test(\"Second slide title has character v at index 4\", function () {\r\n    const data = pm.response.json();\r\n    const character = data.slideshow.slides[1].title.charAt(4);\r\n    pm.expect(character).to.eql(\"v\");\r\n});\r\n\r\npm.test(\"Second slide title returns empty string for missing index\", function () {\r\n    const data = pm.response.json();\r\n    const character = data.slideshow.slides[1].title.charAt(20);\r\n    pm.expect(character).to.eql(\"\");\r\n});\r\n"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://httpbin.org/json",
+              "protocol": "https",
+              "host": [
+                "httpbin",
+                "org"
+              ],
+              "path": [
+                "json"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "API String Character Code Validation Tests",
+      "item": [
+        {
+          "name": "String Character Code Validation Test",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Slideshow title starts with character code 83\", function () {\r\n    const data = pm.response.json();\r\n    const code = data.slideshow.title.charCodeAt(0);\r\n    pm.expect(code).to.eql(83);\r\n});\r\n\r\npm.test(\"Slideshow author has character code 84 at index 6\", function () {\r\n    const data = pm.response.json();\r\n    const code = data.slideshow.author.charCodeAt(6);\r\n    pm.expect(code).to.eql(84);\r\n});\r\n\r\npm.test(\"Second slide title has character code 118 at index 4\", function () {\r\n    const data = pm.response.json();\r\n    const code = data.slideshow.slides[1].title.charCodeAt(4);\r\n    pm.expect(code).to.eql(118);\r\n});\r\n\r\npm.test(\"Second slide title returns NaN for missing character index\", function () {\r\n    const data = pm.response.json();\r\n    const code = data.slideshow.slides[1].title.charCodeAt(20);\r\n    pm.expect(Number.isNaN(code)).to.be.true;\r\n});\r\n"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://httpbin.org/json",
+              "protocol": "https",
+              "host": [
+                "httpbin",
+                "org"
+              ],
+              "path": [
+                "json"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "API String Substring Validation Tests",
+      "item": [
+        {
+          "name": "String Substring Validation Test",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const data = pm.response.json();\r\n\r\npm.test(\"Slideshow title begins with Sample\", function () {\r\n    const result = data.slideshow.title.substring(0, 6);\r\n    pm.expect(result).to.eql(\"Sample\");\r\n});\r\n\r\npm.test(\"Slideshow author begins with Yours\", function () {\r\n    const result = data.slideshow.author.substring(0, 5);\r\n    pm.expect(result).to.eql(\"Yours\");\r\n});\r\n\r\npm.test(\"Overview slide title ends with view\", function () {\r\n    const result = data.slideshow.slides[1].title.substring(4, 8);\r\n    pm.expect(result).to.eql(\"view\");\r\n});\r\n\r\npm.test(\"Substring handles an ending position beyond string length\", function () {\r\n    const result = data.slideshow.slides[1].title.substring(4, 20);\r\n    pm.expect(result).to.eql(\"view\");\r\n});\r\n"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://httpbin.org/json",
+              "protocol": "https",
+              "host": [
+                "httpbin",
+                "org"
+              ],
+              "path": [
+                "json"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "API String Repeat Validation Tests",
+      "item": [
+        {
+          "name": "String Repeat Validation Test",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "\r\nconst data = pm.response.json();\r\n\r\npm.test(\"Slideshow title prefix repeats twice\", function () {\r\n    const prefix = data.slideshow.title.substring(0, 6);\r\n    const result = prefix.repeat(2);\r\n    pm.expect(result).to.eql(\"SampleSample\");\r\n});\r\n\r\npm.test(\"Slideshow author prefix repeats three times\", function () {\r\n    const prefix = data.slideshow.author.substring(0, 5);\r\n    const result = prefix.repeat(3);\r\n    pm.expect(result).to.eql(\"YoursYoursYours\");\r\n});\r\n\r\npm.test(\"Repeating slideshow title zero times returns an empty string\", function () {\r\n    const result = data.slideshow.title.repeat(0);\r\n    pm.expect(result).to.eql(\"\");\r\n});\r\n\r\npm.test(\"Repeating slide title once preserves the original text\", function () {\r\n    const title = data.slideshow.slides[1].title;\r\n    const result = title.repeat(1);\r\n    pm.expect(result).to.eql(\"Overview\");\r\n});\r\n"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://httpbin.org/json",
+              "protocol": "https",
+              "host": [
+                "httpbin",
+                "org"
+              ],
+              "path": [
+                "json"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "API String Padding Validation Tests",
+      "item": [
+        {
+          "name": "String Padding Validation Test",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const data = pm.response.json();\r\n\r\npm.test(\"Slideshow title prefix is padded to eight characters\", function () {\r\n    const prefix = data.slideshow.title.substring(0, 6);\r\n    const result = prefix.padStart(8, \"0\");\r\n    pm.expect(result).to.eql(\"00Sample\");\r\n});\r\n\r\npm.test(\"Slideshow author prefix is padded with asterisks\", function () {\r\n    const prefix = data.slideshow.author.substring(0, 5);\r\n    const result = prefix.padStart(9, \"*\");\r\n    pm.expect(result).to.eql(\"****Yours\");\r\n});\r\n\r\npm.test(\"Padding does not shorten an existing slide title\", function () {\r\n    const title = data.slideshow.slides[1].title;\r\n    const result = title.padStart(4, \"0\");\r\n    pm.expect(result).to.eql(\"Overview\");\r\n});\r\n\r\npm.test(\"Padding preserves a string at its exact target length\", function () {\r\n    const prefix = data.slideshow.title.substring(0, 6);\r\n    const result = prefix.padStart(6, \"0\");\r\n    pm.expect(result).to.eql(\"Sample\");\r\n});\r\n"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://httpbin.org/json",
+              "protocol": "https",
+              "host": [
+                "httpbin",
+                "org"
+              ],
+              "path": [
+                "json"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "API String End Padding Validation Tests",
+      "item": [
+        {
+          "name": "String End Padding Validation Test",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const data = pm.response.json();\r\n\r\npm.test(\"Slideshow title prefix is padded at the end\", function () {\r\n    const prefix = data.slideshow.title.substring(0, 6);\r\n    const result = prefix.padEnd(8, \"0\");\r\n    pm.expect(result).to.eql(\"Sample00\");\r\n});\r\n\r\npm.test(\"Slideshow author prefix is padded at the end with asterisks\", function () {\r\n    const prefix = data.slideshow.author.substring(0, 5);\r\n    const result = prefix.padEnd(8, \"*\");\r\n    pm.expect(result).to.eql(\"Yours***\");\r\n});\r\n\r\npm.test(\"End padding does not shorten an existing slide title\", function () {\r\n    const title = data.slideshow.slides[1].title;\r\n    const result = title.padEnd(4, \"0\");\r\n    pm.expect(result).to.eql(\"Overview\");\r\n});\r\n\r\npm.test(\"Default end padding adds spaces\", function () {\r\n    const prefix = data.slideshow.slides[1].title.substring(0, 4);\r\n    const result = prefix.padEnd(7);\r\n    pm.expect(result).to.eql(\"Over   \");\r\n});\r\n"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://httpbin.org/json",
+              "protocol": "https",
+              "host": [
+                "httpbin",
+                "org"
+              ],
+              "path": [
+                "json"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "API String Start Trimming Validation Tests",
+      "item": [
+        {
+          "name": "String Start Trimming Validation Test",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const data = pm.response.json();\r\n\r\npm.test(\"Leading spaces are removed from slideshow title prefix\", function () {\r\n    const prefix = data.slideshow.title.substring(0, 6);\r\n    const padded = \"   \" + prefix;\r\n    const result = padded.trimStart();\r\n    pm.expect(result).to.eql(\"Sample\");\r\n});\r\n\r\npm.test(\"Start trimming preserves trailing spaces\", function () {\r\n    const prefix = data.slideshow.author.substring(0, 5);\r\n    const spaced = \"  \" + prefix + \"   \";\r\n    const result = spaced.trimStart();\r\n    pm.expect(result).to.eql(\"Yours   \");\r\n});\r\n\r\npm.test(\"Start trimming preserves text without leading spaces\", function () {\r\n    const title = data.slideshow.slides[1].title;\r\n    const result = title.trimStart();\r\n    pm.expect(result).to.eql(\"Overview\");\r\n});\r\n\r\npm.test(\"Start trimming removes leading tabs and newlines\", function () {\r\n    const prefix = data.slideshow.title.substring(0, 6);\r\n    const spaced = \"\\t\\n\" + prefix;\r\n    const result = spaced.trimStart();\r\n    pm.expect(result).to.eql(\"Sample\");\r\n});\r\n"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://httpbin.org/json",
+              "protocol": "https",
+              "host": [
+                "httpbin",
+                "org"
+              ],
+              "path": [
+                "json"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "API String End Trimming Validation Tests",
+      "item": [
+        {
+          "name": "EX-296 - trimEnd()",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"EX-296 trimEnd removes trailing spaces\", function () {\r\n    const original = \"Captain Rachee   \";\r\n    const result = original.trimEnd();\r\n\r\n    pm.expect(result).to.eql(\"Captain Rachee\");\r\n});\r\npm.test(\"EX-296 trimEnd preserves leading spaces\", function () {\r\n    const original = \"   Captain Rachee   \";\r\n    const result = original.trimEnd();\r\n\r\n    pm.expect(result).to.eql(\"   Captain Rachee\");\r\n});\r\npm.test(\"EX-296 trimEnd removes trailing tabs and newlines\", function () {\r\n    const original = \"Captain Rachee\\t\\n\";\r\n    const result = original.trimEnd();\r\n\r\n    pm.expect(result).to.eql(\"Captain Rachee\");\r\n});\r\npm.test(\"EX-296 trimEnd preserves strings without trailing whitespace\", function () {\r\n    const original = \"Captain Rachee\";\r\n    const result = original.trimEnd();\r\n\r\n    pm.expect(result).to.eql(original);\r\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://httpbin.org/json",
+              "protocol": "https",
+              "host": [
+                "httpbin",
+                "org"
+              ],
+              "path": [
+                "json"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Get data",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "postman-echo.com/get",
+          "host": [
+            "postman-echo",
+            "com"
+          ],
+          "path": [
+            "get"
+          ]
+        },
+        "description": "This is a GET request and it is used to \"get\" data from an endpoint. There is no request body for a GET request, but you can use query parameters to help specify the resource you want data on (e.g., in this request, we have `id=1`).\n\nA successful GET response will have a `200 OK` status, and should include some kind of response body - for example, HTML web content or JSON data."
+      },
+      "response": []
+    },
+    {
+      "name": "Post data",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Successful POST request\", function () {",
+              "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+              "});",
+              ""
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n\t\"name\": \"Add your name in the body\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "postman-echo.com/post",
+          "host": [
+            "postman-echo",
+            "com"
+          ],
+          "path": [
+            "post"
+          ]
+        },
+        "description": "This is a POST request, submitting data to an API via the request body. This request submits JSON data, and the data is reflected in the response.\n\nA successful POST request typically returns a `200 OK` or `201 Created` response code."
+      },
+      "response": []
+    },
+    {
+      "name": "Invalid JSON Test",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Malformed JSON returns 400\", function () {\r\n    pm.response.to.have.status(400);\r\n});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"title\": \"Developer Rachee Takes Flight!\",\r\n  \"body\": \"Developer Rachee is learning API testing!\",\r\n  \"userId: 1\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://jsonplaceholder.typicode.com/posts",
+          "protocol": "https",
+          "host": [
+            "jsonplaceholder",
+            "typicode",
+            "com"
+          ],
+          "path": [
+            "posts"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Nonexistent User - 404 Test",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Nonexistent user returns 404\", function () {\r\n    pm.response.to.have.status(404);\r\n});\r\npm.test(\"Nonexistent user returns empty JSON object\", function () {\r\n    const data = pm.response.json();\r\n    pm.expect(data).to.eql({});\r\n});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://jsonplaceholder.typicode.com/users/99999",
+          "protocol": "https",
+          "host": [
+            "jsonplaceholder",
+            "typicode",
+            "com"
+          ],
+          "path": [
+            "users",
+            "99999"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Nonnumeric User - 404 Test",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Nonnumeric user returns 404\", function () {\r\n    pm.response.to.have.status(404);\r\n});\r\npm.test(\"Nonexistent user returns empty JSON object\", function () {\r\n    const data = pm.response.json();\r\n    pm.expect(data).to.eql({});\r\n});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://jsonplaceholder.typicode.com/users/abc",
+          "protocol": "https",
+          "host": [
+            "jsonplaceholder",
+            "typicode",
+            "com"
+          ],
+          "path": [
+            "users",
+            "abc"
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "userId",
+      "value": ""
+    }
+  ]
+}
