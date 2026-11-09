@@ -1,4 +1,5 @@
 # BUG-LOGIN-001 — Employee Portal Login Failure
+**Training Scenario:** This defect report documents a simulated login failure created for QA Engineering practice. It does not represent a verified defect in a live application.
 
 **Defect ID:** BUG-LOGIN-001
 
