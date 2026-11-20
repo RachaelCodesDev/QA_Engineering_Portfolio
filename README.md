@@ -2,7 +2,7 @@
 
 ## About This Portfolio
 
-This portfolio documents my hands-on training and practical projects in Quality Assurance (QA) Engineering. It demonstrates my developing skills in manual software testing, API testing with Postman, JavaScript test assertions, regression testing, test case design, and defect documentation.
+This portfolio showcases my hands-on projects and practical experience developed through structured Quality Assurance (QA) Engineering training. It highlights my work in manual software testing, API testing with Postman, JavaScript assertions, regression testing, test case development, and defect documentation.
 
 ## Portfolio Contents
 
