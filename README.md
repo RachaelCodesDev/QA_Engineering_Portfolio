@@ -39,7 +39,7 @@ In Progress — This portfolio is being developed as part of my hands-on QA Engi
 
 ### Configure Postman Variables
 Before configuring variables, create a Postman environment named `QA Portfolio - Test Environment` and select it as the active environment. The exported collection does not automatically include this environment.
-1. Open Postman and select the environment `QA Portfolio - Test Environment`.
+1. Open Postman, create an environment named QA Portfolio - Test Environment if one does not already exist, and select it as the active environment.
 2. Add a new environment variable named `baseUrl` in the Variable column.
 3. Set its Value to `https://jsonplaceholder.typicode.com`.
 4. Open the imported Postman collection.
