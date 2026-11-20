@@ -41,7 +41,7 @@ In Progress — This portfolio is being developed as part of my hands-on QA Engi
 Before configuring variables, create a Postman environment named `Captain Rachee - QA Practice` and select it as the active environment. The exported collection does not automatically include this environment.
 1. Open Postman and select the environment `Captain Rachee - QA Practice`.
 2. Add a new environment variable named `baseUrl` in the Variable column.
-3. Set its Value to `http://jsonplaceholder.typicode.com`.
+3. Set its Value to `https://jsonplaceholder.typicode.com`.
 4. Open the imported Postman collection.
 5. Select the collection's Variables tab.
 6. Set the `userId` variable's Value to `1`.
