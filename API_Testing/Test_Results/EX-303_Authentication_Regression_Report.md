@@ -11,6 +11,7 @@ Verify that API authentication requests continue to produce their expected HTTP 
 - Postman Environment: Captain Rachee - QA Practice
 - API Service: httpbin.org
 - Testing Type: API Authentication Regression Testing
+- **Historical Configuration Note:** This report documents the original authentication regression execution. The collection and environment names listed above reflect the configuration used at that time. The portfolio's current collection is named `QA Engineering - API Testing Collection`.
 
 ## Test Execution Results
 
