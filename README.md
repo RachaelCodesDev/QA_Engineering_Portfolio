@@ -34,7 +34,7 @@ In Progress — This portfolio is being developed as part of my hands-on QA Engi
 
 1. Open Postman.
 2. Click Import.
-3. Select `API_Testing/Postman_Collections/QA Portfolio - Test Environment.postman_collection.json` from the downloaded portfolio files.
+3. Select `API_Testing/Postman_Collections/QA Engineering - API Testing Collection.postman_collection.json` from the downloaded portfolio files.
 4. Complete the import to add the collection to your Postman workspace.
 
 ### Configure Postman Variables
