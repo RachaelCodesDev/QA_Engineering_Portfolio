@@ -17,6 +17,7 @@ This portfolio showcases my hands-on projects and practical experience developed
   - [Postman API Testing Collection](API_Testing/Postman_Collections/QA%20Engineering%20-%20API%20Testing%20Collection.postman_collection.json)
   - [EX-307 Retrieve User - Test Evidence](API_Testing/Test_Results/EX-307_Reproducibility_Test_Results.png)
   - [Full Postman Regression Test Evidence](API_Testing/Test_Results/QA_Portfolio_Full_Regression_154_Passed_1_Failed_Final.png)
+  - [Full Postman Regression Test Report](API_Testing/Test_Results/Full_Postman_Regression_Test_Report.md)
 
 ## Tools & Technologies
 
