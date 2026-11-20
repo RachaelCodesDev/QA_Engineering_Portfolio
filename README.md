@@ -11,7 +11,7 @@ This portfolio documents my hands-on training and practical projects in Quality 
 - Defect Reports — Sample bug reports documenting issues and their impact.
   - [BUG-LOGIN-001 — Employee Portal Login Failure](Defect_Reports/BUG-LOGIN-001.md)
 - Test Evidence — Screenshots and results supporting executed tests.
-  - [EX-307 Reproducibility Test Results](API_Testing/Test_Results/EX-307_Reproducibility_Test_Results.png)
+  - [EX-307 Retrieve User - 4 Passing Assertions](API_Testing/Test_Results/EX-307_Reproducibility_Test_Results.png)
 - API Testing — Postman requests, JavaScript assertions, and regression testing examples.
   - [Authentication Regression Test Report](API_Testing/Test_Results/EX-303_Authentication_Regression_Report.md)
   - [Postman API Testing Collection](API_Testing/Postman_Collections/Captain%20Rachee%20-%20QA%20Portfolio%20Collection.postman_collection.json)
