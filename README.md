@@ -14,7 +14,7 @@ This portfolio documents my hands-on training and practical projects in Quality 
   - [EX-307 Retrieve User - 4 Passing Assertions](API_Testing/Test_Results/EX-307_Reproducibility_Test_Results.png)
 - API Testing — Postman requests, JavaScript assertions, and regression testing examples.
   - [Authentication Regression Test Report](API_Testing/Test_Results/EX-303_Authentication_Regression_Report.md)
-  - [Postman API Testing Collection](API_Testing/Postman_Collections/Captain%20Rachee%20-%20QA%20Portfolio%20Collection.postman_collection.json)
+  - [Postman API Testing Collection](API_Testing/Postman_Collections/QA%20Engineering%20-%20API%20Testing%20Collection.postman_collection%283%29.json)
   - [EX-307 Retrieve User - Test Evidence](API_Testing/Test_Results/EX-307_Reproducibility_Test_Results.png)
 
 ## Tools & Technologies
