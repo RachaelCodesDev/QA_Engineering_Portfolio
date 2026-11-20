@@ -34,12 +34,12 @@ In Progress — This portfolio is being developed as part of my hands-on QA Engi
 
 1. Open Postman.
 2. Click Import.
-3. Select `API_Testing/Postman_Collections/Captain Rachee - QA Portfolio Collection.postman_collection.json` from the downloaded portfolio files.
+3. Select `API_Testing/Postman_Collections/QA Portfolio - Test Environment.postman_collection.json` from the downloaded portfolio files.
 4. Complete the import to add the collection to your Postman workspace.
 
 ### Configure Postman Variables
-Before configuring variables, create a Postman environment named `Captain Rachee - QA Practice` and select it as the active environment. The exported collection does not automatically include this environment.
-1. Open Postman and select the environment `Captain Rachee - QA Practice`.
+Before configuring variables, create a Postman environment named `QA Portfolio - Test Environment` and select it as the active environment. The exported collection does not automatically include this environment.
+1. Open Postman and select the environment `QA Portfolio - Test Environment`.
 2. Add a new environment variable named `baseUrl` in the Variable column.
 3. Set its Value to `https://jsonplaceholder.typicode.com`.
 4. Open the imported Postman collection.
